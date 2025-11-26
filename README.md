@@ -17,6 +17,23 @@ AI PDF Reader combines a full-featured PDF viewer with a context-aware chat inte
 -   **Privacy-Focused**: The PDF is processed locally in your browser. Only the text content and your questions are sent to the AI API you configure.
     -   **Security Note**: Your API Key is stored in your browser's **Local Storage** (`localStorage`). It remains on your device and is never transmitted to any third-party server other than the AI provider you specify.
 
+
+## How it Works
+
+The application communicates with the AI model by sending a structured prompt that includes your question and the relevant text extracted from the PDF.
+
+### Prompts
+1.  **System Prompt**: Defines the AI's role.
+    *   *Single Page*: "You are a helpful AI PDF assistant. You have access to the content of PAGE {pageNum} of the document provided below..."
+    *   *Full Document*: "You are a helpful AI PDF assistant. You have access to the full content of the document provided below..."
+2.  **User Message**: Contains the context and your query.
+    ```text
+    Document Content:
+    {extracted_text_from_pdf}
+
+    Question: {your_question}
+    ```
+
 ## Technology Stack
 
 -   **Frontend**: HTML5, CSS3, Vanilla JavaScript
