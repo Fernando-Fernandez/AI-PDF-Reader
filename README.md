@@ -9,30 +9,24 @@ AI PDF Reader combines a full-featured PDF viewer with a context-aware chat inte
 ## Features & Implementation
 
 1. **In-Browser PDF Viewing**  
-   *Implementation:* `pdfjsLib.getDocument` plus `renderPage`, `queueRenderPage`, and the canvas in `index.html` provide paging, overlays, zoom, and keyboard-friendly navigation without relying on the default PDF.js viewer.
+   *Implementation:* `pdfjsLib` renders the PDF view in `index.html` with pagination and zoom controls.
 
 2. **Text Extraction + Caching**  
    *Implementation:* `getPageText` in `app.js` pulls text content via `page.getTextContent()` and stores it in the `currentPdfText` map so repeated questions/ searches stay fast. `getFullPdfText` reuses the cache to stitch multi-page context.
 
 3. **Context-Aware Chat (Page & Full Document Modes)**  
-   *Implementation:* `handleSendMessage` builds the system/user prompts based on either the current page or the requested range, then streams responses back into the chat UI. The context toggle, page-count input, and the `contextModeCheckbox` wiring live in `index.html` + `app.js`.
+   *Implementation:* `handleSendMessage` builds the system/user prompts based on either the current page or the requested range, then streams LLM responses back into the chat UI. The context toggle, page-count input, and the `contextModeCheckbox` wiring live in `index.html` + `app.js`.
 
-4. **Streaming Responses (API Mode)**  
-   *Implementation:* A `fetch` call to the OpenAI-compatible `/chat/completions` endpoint is read via `ReadableStream.getReader()`. Each SSE `data:` chunk updates the most recent AI message, rendered with `marked` for lightweight Markdown formatting.
-
-5. **Bring-Your-Own-Key API Settings**  
+4. **Bring-Your-Own-Key API Settings**  
    *Implementation:* The settings modal stores `apiKey`, `apiUrl`, and `modelName` in `localStorage`, wiring the inputs to the `settings` object so the app works with OpenAI, compatible APIs, or local proxies.
 
-6. **Local Model Execution (WebGPU)**  
-   *Implementation:* Selecting “Local Device (WebGPU)” swaps the UI to the local section, spawns a Blob-based worker (`initWorker`), and loads the inlined Transformers.js bundle (`public/transformers_lib.js`). The worker code manages tokenizer/model caching, WebGPU/CPU fallback, streaming via `TextStreamer`, and progress updates.
+5. **Streaming Responses (API Mode)**  
+   *Implementation:* A `fetch` call to the OpenAI-compatible `/chat/completions` endpoint is read via `ReadableStream.getReader()`. Each SSE `data:` chunk updates the most recent AI message, rendered with `marked` for lightweight Markdown formatting.
 
-7. **Centralized Model Registry + Dropdown**  
-   *Implementation:* `public/models.js` exports `MODEL_REGISTRY`, and `populateLocalModelOptions` builds the local-model `<select>` from that registry so entries stay in sync across the UI and worker. The current selection is pushed to the worker via `postMessage({ type: 'set_model' })`.
+6. **Local Model Execution (WebGPU Mode)**  
+   *Implementation:* Selecting “Local Device (WebGPU)” swaps the UI to local LLM use (ONNX models), spawns a Blob-based worker (`initWorker`), and loads the inlined Transformers.js bundle (`public/transformers_lib.js`). The worker code manages tokenizer/model caching, WebGPU/CPU fallback, streaming via `TextStreamer`, and progress updates.
 
-8. **Resizable Split Layout & Rich Controls**  
-   *Implementation:* The draggable `#resizer`, overlay buttons, zoom controls, and settings modal are plain HTML/CSS (`style.css`) with event handlers in `app.js`, keeping everything framework-free.
-
-9. **Privacy-Focused Storage**  
+7. **Privacy-Focused Storage**  
    *Implementation:* PDFs stay entirely in-browser; only extracted text and the user’s prompt are sent to the API endpoint they configure. API keys remain in `localStorage` and are never transmitted elsewhere.
 
 > **Security Note:** Your API Key is stored in your browser's **Local Storage** (`localStorage`). It remains on your device and is only sent directly to the AI provider you configure.
