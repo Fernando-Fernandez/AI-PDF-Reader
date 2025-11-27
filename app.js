@@ -129,8 +129,16 @@ function onPageNumChange() {
     queueRenderPage(pageNum);
 }
 
+const overlayPrevBtn = document.getElementById('overlay-prev');
+const overlayNextBtn = document.getElementById('overlay-next');
+
+// ... (existing code)
+
 prevPageBtn.addEventListener('click', onPrevPage);
 nextPageBtn.addEventListener('click', onNextPage);
+overlayPrevBtn.addEventListener('click', onPrevPage);
+overlayNextBtn.addEventListener('click', onNextPage);
+
 pageNumInput.addEventListener('change', onPageNumChange);
 pageNumInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -162,6 +170,10 @@ pdfUpload.addEventListener('change', function (e) {
                 pdfPlaceholder.style.display = 'none';
                 canvas.style.display = 'block';
                 pdfControls.style.display = 'flex';
+
+                // Show overlays
+                overlayPrevBtn.style.display = 'flex';
+                overlayNextBtn.style.display = 'flex';
 
                 renderPage(pageNum);
                 addSystemMessage(`Loaded "${file.name}" with ${pdfDoc.numPages} pages.`);
