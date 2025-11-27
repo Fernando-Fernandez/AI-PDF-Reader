@@ -19,7 +19,7 @@ let settings = {
 const pdfUpload = document.getElementById('pdf-upload');
 const fileNameDisplay = document.getElementById('file-name');
 const pdfControls = document.getElementById('pdf-controls');
-const pageNumSpan = document.getElementById('page-num');
+const pageNumInput = document.getElementById('page-num');
 const pageCountSpan = document.getElementById('page-count');
 const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
@@ -42,10 +42,10 @@ const contextModeCheckbox = document.getElementById('context-mode');
  */
 function renderPage(num) {
     pageRendering = true;
-    
+
     // Fetch page
-    pdfDoc.getPage(num).then(function(page) {
-        const viewport = page.getViewport({scale: scale});
+    pdfDoc.getPage(num).then(function (page) {
+        const viewport = page.getViewport({ scale: scale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
@@ -57,7 +57,7 @@ function renderPage(num) {
         const renderTask = page.render(renderContext);
 
         // Wait for render to finish
-        renderTask.promise.then(function() {
+        renderTask.promise.then(function () {
             pageRendering = false;
             if (pageNumPending !== null) {
                 // New page rendering is pending
@@ -68,7 +68,7 @@ function renderPage(num) {
     });
 
     // Update page counters
-    pageNumSpan.textContent = num;
+    pageNumInput.value = num;
 }
 
 /**
@@ -105,33 +105,58 @@ function onNextPage() {
     queueRenderPage(pageNum);
 }
 
+/**
+ * Jump to specific page via input
+ */
+function onPageNumChange() {
+    let num = parseInt(pageNumInput.value);
+    if (isNaN(num)) {
+        pageNumInput.value = pageNum;
+        return;
+    }
+
+    // Clamp value
+    if (num < 1) num = 1;
+    if (num > pdfDoc.numPages) num = pdfDoc.numPages;
+
+    pageNum = num;
+    queueRenderPage(pageNum);
+}
+
 prevPageBtn.addEventListener('click', onPrevPage);
 nextPageBtn.addEventListener('click', onNextPage);
+pageNumInput.addEventListener('change', onPageNumChange);
+pageNumInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        onPageNumChange();
+        pageNumInput.blur(); // Remove focus
+    }
+});
 
 /**
  * Handle file upload
  */
-pdfUpload.addEventListener('change', function(e) {
+pdfUpload.addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
         const fileReader = new FileReader();
-        fileReader.onload = function() {
+        fileReader.onload = function () {
             const typedarray = new Uint8Array(this.result);
             fileNameDisplay.textContent = file.name;
-            
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_) {
+
+            pdfjsLib.getDocument(typedarray).promise.then(function (pdfDoc_) {
                 pdfDoc = pdfDoc_;
                 pageCountSpan.textContent = pdfDoc.numPages;
-                
+
                 // Reset state
                 pageNum = 1;
-                currentPdfText = {}; 
-                
+                currentPdfText = {};
+
                 // UI updates
                 pdfPlaceholder.style.display = 'none';
                 canvas.style.display = 'block';
                 pdfControls.style.display = 'flex';
-                
+
                 renderPage(pageNum);
                 addSystemMessage(`Loaded "${file.name}" with ${pdfDoc.numPages} pages.`);
             });
@@ -146,14 +171,14 @@ async function getPageText(pageNum) {
     if (currentPdfText[pageNum]) {
         return currentPdfText[pageNum];
     }
-    
+
     if (!pdfDoc) return "";
 
     const page = await pdfDoc.getPage(pageNum);
     const textContent = await page.getTextContent();
     const textItems = textContent.items.map(item => item.str);
     const text = textItems.join(' ');
-    
+
     currentPdfText[pageNum] = text;
     return text;
 }
@@ -172,21 +197,21 @@ async function getFullPdfText() {
 function addMessage(content, type) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
-    
+
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    
+
     if (type === 'ai') {
         // For AI, we might stream content, so we return the element
         contentDiv.innerHTML = ''; // Start empty
     } else {
         contentDiv.textContent = content;
     }
-    
+
     messageDiv.appendChild(contentDiv);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    
+
     return contentDiv;
 }
 
@@ -198,7 +223,7 @@ function addSystemMessage(text) {
 async function handleSendMessage() {
     const question = userInput.value.trim();
     if (!question) return;
-    
+
     if (!settings.apiKey) {
         addSystemMessage("⚠️ Please set your API Key in settings first.");
         settingsModal.style.display = 'flex';
@@ -219,7 +244,7 @@ async function handleSendMessage() {
     // Prepare Context
     let context = "";
     let systemPrompt = "";
-    
+
     try {
         if (contextModeCheckbox.checked) {
             addSystemMessage("Extracting full document text... (this may take a moment)");
@@ -267,10 +292,10 @@ async function handleSendMessage() {
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            
+
             const chunk = decoder.decode(value);
             const lines = chunk.split('\n');
-            
+
             for (const line of lines) {
                 if (line.startsWith('data: ') && line !== 'data: [DONE]') {
                     try {
@@ -315,7 +340,7 @@ userInput.addEventListener('keydown', (e) => {
 });
 
 // Auto-resize textarea
-userInput.addEventListener('input', function() {
+userInput.addEventListener('input', function () {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
     sendBtn.disabled = this.value.trim() === '';
@@ -344,11 +369,11 @@ saveSettingsBtn.addEventListener('click', () => {
     settings.apiKey = document.getElementById('api-key').value.trim();
     settings.apiUrl = document.getElementById('api-url').value.trim();
     settings.modelName = document.getElementById('model-name').value.trim();
-    
+
     localStorage.setItem('apiKey', settings.apiKey);
     localStorage.setItem('apiUrl', settings.apiUrl);
     localStorage.setItem('modelName', settings.modelName);
-    
+
     settingsModal.style.display = 'none';
     addSystemMessage("Settings saved.");
 });
