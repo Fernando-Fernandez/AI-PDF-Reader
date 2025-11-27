@@ -35,6 +35,8 @@ const saveSettingsBtn = document.getElementById('save-settings');
 const contextModeCheckbox = document.getElementById('context-mode');
 const pageContextCountInput = document.getElementById('page-context-count');
 
+const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+
 // --- PDF Handling ---
 
 /**
@@ -43,6 +45,9 @@ const pageContextCountInput = document.getElementById('page-context-count');
  */
 function renderPage(num) {
     pageRendering = true;
+
+    // Scroll to top
+    pdfViewerContainer.scrollTop = 0;
 
     // Fetch page
     pdfDoc.getPage(num).then(function (page) {
