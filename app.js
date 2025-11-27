@@ -132,12 +132,37 @@ function onPageNumChange() {
 const overlayPrevBtn = document.getElementById('overlay-prev');
 const overlayNextBtn = document.getElementById('overlay-next');
 
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+const zoomLevelSpan = document.getElementById('zoom-level');
+
 // ... (existing code)
+
+/**
+ * Zoom In
+ */
+function onZoomIn() {
+    scale += 0.25;
+    zoomLevelSpan.textContent = `${Math.round(scale * 100)}%`;
+    renderPage(pageNum);
+}
+
+/**
+ * Zoom Out
+ */
+function onZoomOut() {
+    if (scale <= 0.5) return;
+    scale -= 0.25;
+    zoomLevelSpan.textContent = `${Math.round(scale * 100)}%`;
+    renderPage(pageNum);
+}
 
 prevPageBtn.addEventListener('click', onPrevPage);
 nextPageBtn.addEventListener('click', onNextPage);
 overlayPrevBtn.addEventListener('click', onPrevPage);
 overlayNextBtn.addEventListener('click', onNextPage);
+zoomInBtn.addEventListener('click', onZoomIn);
+zoomOutBtn.addEventListener('click', onZoomOut);
 
 pageNumInput.addEventListener('change', onPageNumChange);
 pageNumInput.addEventListener('keydown', (e) => {
@@ -414,3 +439,35 @@ if (!settings.apiKey) {
         addSystemMessage("👋 Welcome! Please click the gear icon ⚙️ to set your API Key.");
     }, 1000);
 }
+
+// --- Resizable Panel ---
+const resizer = document.getElementById('resizer');
+const chatSection = document.querySelector('.chat-section');
+let isResizing = false;
+
+resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    resizer.classList.add('resizing');
+    document.body.style.cursor = 'col-resize';
+    e.preventDefault(); // Prevent text selection
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+
+    // Calculate new width (from right edge)
+    const newWidth = window.innerWidth - e.clientX;
+
+    // Constraints
+    if (newWidth > 300 && newWidth < 800) {
+        chatSection.style.width = `${newWidth}px`;
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    if (isResizing) {
+        isResizing = false;
+        resizer.classList.remove('resizing');
+        document.body.style.cursor = 'default';
+    }
+});

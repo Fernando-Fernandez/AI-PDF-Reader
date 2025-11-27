@@ -75,11 +75,21 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
+.pdf-viewer-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #525659;
+}
+
 .pdf-viewer-container {
     flex: 1;
     overflow: auto;
-    background-color: #525659;
     position: relative;
+    width: 100%;
+    height: 100%;
     /* Removed display: flex to allow canvas to expand naturally */
 }
 
@@ -88,8 +98,7 @@ body {
     margin: 20px auto;
     /* Center horizontally with margin */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    max-width: 95%;
-    /* Prevent horizontal overflow if possible, or remove if scrolling is preferred */
+    /* max-width: 95%; Removed to allow zooming */
 }
 
 #pdf-placeholder {
@@ -111,7 +120,7 @@ body {
 
 /* Chat Section */
 .chat-section {
-    width: 400px;
+    width: 40%;
     display: flex;
     flex-direction: column;
     background-color: var(--surface-color);
@@ -352,6 +361,7 @@ body {
     font-size: inherit;
     -moz-appearance: textfield;
     /* Firefox */
+    appearance: textfield;
 }
 
 .page-input::-webkit-outer-spin-button,
@@ -409,3 +419,17 @@ body {
    If placeholder is visible, maybe hide them? 
    They are inside .pdf-viewer-container. 
 */
+
+/* Resizer */
+.resizer {
+    width: 5px;
+    background-color: var(--border-color);
+    cursor: col-resize;
+    transition: background-color 0.2s;
+    z-index: 50;
+}
+
+.resizer:hover,
+.resizer.resizing {
+    background-color: var(--primary-color);
+}

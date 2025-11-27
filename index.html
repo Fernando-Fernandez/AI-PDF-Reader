@@ -29,20 +29,29 @@
                     <span id="page-info">Page <input type="number" id="page-num" value="0" min="1" class="page-input">
                         of <span id="page-count">0</span></span>
                     <button id="next-page" class="icon-btn" title="Next Page">→</button>
+                    <span style="border-left: 1px solid var(--border-color); height: 20px; margin: 0 10px;"></span>
+                    <button id="zoom-out" class="icon-btn" title="Zoom Out">-</button>
+                    <span id="zoom-level" style="font-size: 0.9rem; min-width: 45px; text-align: center;">150%</span>
+                    <button id="zoom-in" class="icon-btn" title="Zoom In">+</button>
                 </div>
             </div>
-            <div class="pdf-viewer-container" id="pdf-viewer-container">
+            <div class="pdf-viewer-wrapper">
                 <button id="overlay-prev" class="nav-overlay prev" title="Previous Page">‹</button>
-                <div id="pdf-placeholder">
-                    <div class="placeholder-content">
-                        <h2>AI PDF Reader</h2>
-                        <p>Upload a PDF to get started</p>
+                <div class="pdf-viewer-container" id="pdf-viewer-container">
+                    <div id="pdf-placeholder">
+                        <div class="placeholder-content">
+                            <h2>AI PDF Reader</h2>
+                            <p>Upload a PDF to get started</p>
+                        </div>
                     </div>
+                    <canvas id="pdf-render"></canvas>
                 </div>
-                <canvas id="pdf-render"></canvas>
                 <button id="overlay-next" class="nav-overlay next" title="Next Page">›</button>
             </div>
         </div>
+
+        <!-- Resizer -->
+        <div class="resizer" id="resizer"></div>
 
         <!-- Chat Interface -->
         <div class="chat-section">
