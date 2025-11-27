@@ -368,11 +368,11 @@ body {
 /* Overlay Navigation */
 .nav-overlay {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 60px;
-    height: 100px;
-    background-color: rgba(0, 0, 0, 0.1);
+    top: 0;
+    height: 100%;
+    width: 80px;
+    background-color: transparent;
+    /* Transparent by default */
     border: none;
     color: rgba(255, 255, 255, 0.8);
     font-size: 3rem;
@@ -381,32 +381,28 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    border-radius: 8px;
     z-index: 20;
     opacity: 0;
-    /* Hidden by default, shown on hover of container? Or just low opacity? */
 }
 
-/* Show on hover of the container, or just always visible but low opacity? 
-   Let's make them visible on hover of the button itself, or low opacity default.
-   User said "translucent buttons", usually implies visible but see-through.
-*/
-.nav-overlay {
-    opacity: 0.2;
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
+/* Show on hover */
 .nav-overlay:hover {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.1);
+    /* Subtle background on hover */
+}
+
+/* Active state for feedback */
+.nav-overlay:active {
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .nav-overlay.prev {
-    left: 20px;
+    left: 0;
 }
 
 .nav-overlay.next {
-    right: 20px;
+    right: 0;
 }
 
 /* Hide overlays if no PDF loaded? Handled by JS or just let them sit there? 
