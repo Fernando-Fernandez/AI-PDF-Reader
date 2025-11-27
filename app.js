@@ -33,6 +33,7 @@ const settingsModal = document.getElementById('settings-modal');
 const closeModal = document.querySelector('.close-modal');
 const saveSettingsBtn = document.getElementById('save-settings');
 const contextModeCheckbox = document.getElementById('context-mode');
+const pageContextCountInput = document.getElementById('page-context-count');
 
 // --- PDF Handling ---
 
@@ -251,8 +252,20 @@ async function handleSendMessage() {
             context = await getFullPdfText();
             systemPrompt = "You are a helpful AI PDF assistant. You have access to the full content of the document provided below. Answer the user's question based on the document content.";
         } else {
-            context = await getPageText(pageNum);
-            systemPrompt = `You are a helpful AI PDF assistant. You have access to the content of PAGE ${pageNum} of the document provided below. Answer the user's question based on this page's content.`;
+            const pageCount = parseInt(pageContextCountInput.value) || 1;
+            let startPage = pageNum;
+            let endPage = Math.min(pageNum + pageCount - 1, pdfDoc.numPages);
+
+            if (pageCount > 1) {
+                addSystemMessage(`Reading pages ${startPage} to ${endPage}...`);
+                for (let i = startPage; i <= endPage; i++) {
+                    context += `[Page ${i}]\n` + await getPageText(i) + "\n\n";
+                }
+                systemPrompt = `You are a helpful AI PDF assistant. You have access to the content of PAGES ${startPage} to ${endPage} of the document provided below. Answer the user's question based on these pages' content.`;
+            } else {
+                context = await getPageText(pageNum);
+                systemPrompt = `You are a helpful AI PDF assistant. You have access to the content of PAGE ${pageNum} of the document provided below. Answer the user's question based on this page's content.`;
+            }
         }
     } catch (err) {
         addSystemMessage("Error extracting text: " + err.message);

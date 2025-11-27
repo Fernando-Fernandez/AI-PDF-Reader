@@ -64,6 +64,14 @@
                         <span>Ask about full document (beta)</span>
                     </label>
                 </div>
+                <div class="context-range"
+                    style="margin-bottom: 10px; font-size: 0.85rem; color: var(--text-secondary);">
+                    <label>
+                        Pages to read:
+                        <input type="number" id="page-context-count" value="1" min="1" max="10"
+                            style="width: 50px; padding: 2px 5px; border: 1px solid var(--border-color); border-radius: 4px;">
+                    </label>
+                </div>
                 <div class="input-wrapper">
                     <textarea id="user-input" placeholder="Ask a question about this page..." rows="1"></textarea>
                     <button id="send-btn" class="btn-send" disabled>→</button>
