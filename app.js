@@ -7,6 +7,7 @@ let scale = 1.5;
 let canvas = document.getElementById('pdf-render');
 let ctx = canvas.getContext('2d');
 let currentPdfText = {}; // Cache for extracted text: { pageNum: "text" }
+let useLocalModel = false;
 
 // Settings
 let settings = {
@@ -267,7 +268,7 @@ async function handleSendMessage() {
     const question = userInput.value.trim();
     if (!question) return;
 
-    if (!settings.apiKey) {
+    if (!useLocalModel && !settings.apiKey) {
         addSystemMessage("⚠️ Please set your API Key in settings first.");
         settingsModal.style.display = 'flex';
         return;
@@ -456,14 +457,13 @@ saveSettingsBtn.addEventListener('click', () => {
 });
 
 // Initialize
-if (!settings.apiKey) {
+if (!useLocalModel && !settings.apiKey) {
     setTimeout(() => {
         addSystemMessage("👋 Welcome! Please click the gear icon ⚙️ to set your API Key.");
     }, 1000);
 }
 
 // --- Local Model State ---
-let useLocalModel = false;
 let worker = null;
 let isModelLoading = false;
 let isModelReady = false;
